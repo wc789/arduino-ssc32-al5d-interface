@@ -25,13 +25,14 @@ int gripValue = 1100;
 
 
 //Vakio aika 1 sekunti
-int basicTime = 10000;
+int basicTime =2000;
 int transitionSpeed = 10;
-
-
 
 void setup(){
   Serial.begin(9600);
+  
+  delay(1000);
+  startPosition();
   
 // alustaa tarvittavat nappulat liikuttamiseen
   pinMode(2, INPUT);
@@ -60,8 +61,6 @@ void startPosition(){
 
 void loop(){
   
-  delay(1000);
-  startPosition();
   switchShoulderBack = digitalRead(2);
   switchShoulderForward = digitalRead(3);
   switchElbowBack = digitalRead(4);
@@ -71,27 +70,30 @@ void loop(){
   switchBase = analogRead(A0);
   switchGrip = analogRead(A1);
      
-  
-  if(switchShoulderBack == LOW){
+  if(switchShoulderBack == HIGH){
     shoulderValue -= transitionSpeed;
+    updatePositions();
   }
-  if(switchShoulderForward == LOW){
+  if(switchShoulderForward == HIGH){
     shoulderValue += transitionSpeed;
+    updatePositions();
   }
-  if(switchElbowBack == LOW){
+  if(switchElbowBack == HIGH){
     elbowValue -= transitionSpeed;
+    updatePositions();
   }
-  if(switchElbowForward == LOW){
+  if(switchElbowForward == HIGH){
     elbowValue += transitionSpeed;
+    updatePositions();
   }
-  if(switchWristUp == LOW){
+  if(switchWristUp == HIGH){
     wristValue -= transitionSpeed;
+    updatePositions();
   }
   
-  if(switchWristDown == LOW){
+  if(switchWristDown == HIGH){
     wristValue += transitionSpeed;
+    updatePositions();
   }
   
 }
-
-
