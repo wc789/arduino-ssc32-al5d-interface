@@ -3,6 +3,7 @@
 //pohja
 int switchBase = 0;
 int baseValue = 1500;
+int newBaseValue = 1500;
 
 // alin servo
 int switchShoulderForward = 0;
@@ -94,6 +95,12 @@ void loop(){
   if(switchWristDown == HIGH){
     wristValue += transitionSpeed;
     updatePositions();
+  }
+  
+  newBaseValue = (analogRead(A0) * 2) + 500;
+  if(baseValue != newBaseValue) {
+	baseValue = newBaseValue;
+	updatePositions();
   }
   
 }
