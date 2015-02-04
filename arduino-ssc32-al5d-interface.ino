@@ -20,7 +20,7 @@ const int servo5_upper_limit;
 const int servo5_lower_limit;
 
 void setup() {
-	Serial.begin(9600);
+	Serial.begin(115200);
 	
 }
 
