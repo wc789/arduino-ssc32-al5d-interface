@@ -71,11 +71,11 @@ void loop(){
   switchGrip = analogRead(A1);
      
   if(switchShoulderBack == HIGH){
-    shoulderValue -= transitionSpeed;
+    shoulderValue += transitionSpeed;
     updatePositions();
   }
   if(switchShoulderForward == HIGH){
-    shoulderValue += transitionSpeed;
+    shoulderValue -= transitionSpeed;
     updatePositions();
   }
   if(switchElbowBack == HIGH){
