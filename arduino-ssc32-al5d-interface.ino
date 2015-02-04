@@ -8,6 +8,7 @@ int baseValue = 1500;
 int switchShoulderForward = 0;
 int switchShoulderBack = 0;
 int shoulderValue = 1500;
+int shoulderValue = 1500; 
 
 //kyynärpää
 int switchElbowForward = 0;
@@ -28,6 +29,7 @@ int gripValue = 1100;
 int basicTime =2000;
 int transitionSpeed = 100;
 
+int transitionSpeed = 10;
 
 void setup(){
   Serial.begin(9600);
@@ -119,27 +121,33 @@ void loop(){
      
   
   if(switchShoulderBack == HIGH{
+  if(switchShoulderBack == HIGH){
     shoulderValue -= transitionSpeed;
     updatePositions();
   }
   if(switchShoulderForward == LOW){
+  if(switchShoulderForward == HIGH){
     shoulderValue += transitionSpeed;
     updatePositions();
   }
   if(switchElbowBack == LOW){
+  if(switchElbowBack == HIGH){
     elbowValue -= transitionSpeed;
     updatePositions();
   }
   if(switchElbowForward == LOW){
+  if(switchElbowForward == HIGH){
     elbowValue += transitionSpeed;
     updatePositions();
   }
   if(switchWristUp == LOW){
+  if(switchWristUp == HIGH){
     wristValue -= transitionSpeed;
     updatePositions();
   }
   
   if(switchWristDown == LOW){
+  if(switchWristDown == HIGH){
     wristValue += transitionSpeed;
     updatePositions();
   }
@@ -157,3 +165,7 @@ void updatePositions(){
 }
 
 
+  Serial.println(send + 5 + "P" + gripValue + "T" + 15);
+  
+  
+}
