@@ -97,3 +97,14 @@ void loop(){
   }
   
 }
+
+void updatePositions(){
+  String send = "#";
+  Serial.print(send + 1 + "P" + baseValue );
+  Serial.print(send + 2 + "P" + shoulderValue);
+  Serial.print(send + 3 + "P" + elbowValue );
+  Serial.print(send + 4 + "P" + wristValue );
+  Serial.println(send + 5 + "P" + gripValue + "T" + 15);
+  
+  
+}
