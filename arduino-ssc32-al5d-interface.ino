@@ -27,7 +27,7 @@ int gripValue = 1100;
 //Vakio aika 1 sekunti
 int basicTime =2000;
 int transitionSpeed = 10;
-
+float headHeight = 0.0;
 
 
 void setup(){
@@ -110,5 +110,21 @@ void updatePositions(){
   Serial.print(send + 4 + "P" + wristValue );
   Serial.println(send + 5 + "P" + gripValue + "T" + 15);
   
-  
+  kinematics();
+ 
 }
+
+void kinematics(){
+  
+  double alpha = shoulderValue;
+  double beta = elbowValue;
+  float pi = 3.14;
+  
+  float sumFirst = 14.5*sin((alpha-500.0)/636.62);
+  float sumSecond = 18.5*sin(((beta-1000)/477,46)-((alpha-500)/636,62));  
+  
+  headHeight = sumFirst- sumSecond;  
+  Serial.println(headHeight);
+
+}
+  
