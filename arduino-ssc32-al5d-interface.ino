@@ -26,7 +26,7 @@ int gripValue = 1100;
 
 //Vakio aika 1 sekunti
 int basicTime =2000;
-int transitionSpeed = 100;
+int transitionSpeed = 10;
 
 
 
@@ -74,28 +74,28 @@ void loop(){
   switchGrip = analogRead(A1);
      
   
-  if(switchShoulderBack == HIGH{
+  if(switchShoulderBack == HIGH){
     shoulderValue -= transitionSpeed;
     updatePositions();
   }
-  if(switchShoulderForward == LOW){
+  if(switchShoulderForward == HIGH){
     shoulderValue += transitionSpeed;
     updatePositions();
   }
-  if(switchElbowBack == LOW){
+  if(switchElbowBack == HIGH){
     elbowValue -= transitionSpeed;
     updatePositions();
   }
-  if(switchElbowForward == LOW){
+  if(switchElbowForward == HIGH){
     elbowValue += transitionSpeed;
     updatePositions();
   }
-  if(switchWristUp == LOW){
+  if(switchWristUp == HIGH){
     wristValue -= transitionSpeed;
     updatePositions();
   }
   
-  if(switchWristDown == LOW){
+  if(switchWristDown == HIGH){
     wristValue += transitionSpeed;
     updatePositions();
   }
@@ -108,9 +108,7 @@ void updatePositions(){
   Serial.print(send + 2 + "P" + shoulderValue);
   Serial.print(send + 3 + "P" + elbowValue );
   Serial.print(send + 4 + "P" + wristValue );
-  Serial.println(send + 5 + "P" + gripValue + "T" + basicTime);
-  delay(15);
+  Serial.println(send + 5 + "P" + gripValue + "T" + 15);
+  
   
 }
-
-
