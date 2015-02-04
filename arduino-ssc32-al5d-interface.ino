@@ -1,45 +1,116 @@
-// Variables for servo values and limits
-int servo1_value;
-const int servo1_upper_limit;
-const int servo1_lower_limit;
+// switch.. kertoo onko nappi painettu
 
-int Servo2_value;
-const int servo2_upper_limit;
-const int servo2_lower_limit;
+//pohja
+int switchBase = 0;
+int baseValue = 1500;
 
-int Servo3_value;
-const int servo3_upper_limit;
-const int servo3_lower_limit;
+// alin servo
+int switchShoulderForward = 0;
+int switchShoulderBack = 0;
+int shoulderValue = 1500; 
 
-int Servo4_value;
-const int servo4_upper_limit;
-const int servo4_lower_limit;
 
-int servo5_value;
-const int servo5_upper_limit;
-const int servo5_lower_limit;
+int switchElbowForward = 0;
+int switchElbowBack = 0;
+int elbowValue = 1500;
 
-void setup() {
-	Serial.begin(115200);
-	
+//ranne 
+int switchWristDown = 0;
+int switchWristUp = 0;
+int wristValue = 1500;
+
+//koura 
+int switchGrip = 0; 
+int gripValue = 1100;
+
+
+//Vakio aika 1 sekunti
+int basicTime =2000;
+int transitionSpeed = 100;
+
+
+
+void setup(){
+  Serial.begin(9600);
+  
+  
+  delay(1000);
+  startPosition();
+  
+// alustaa tarvittavat nappulat liikuttamiseen
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
+  pinMode(4, INPUT);
+  pinMode(5, INPUT);
+  pinMode(6, INPUT);
+  pinMode(7, INPUT);
+  pinMode(2, INPUT);
+  
+// alustaa rullat, joilla ohjataan pohjan kiertoa ja kouraa
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
 }
 
-void loop() {
-	
+// ohjelman käynnistyessä robotti halutaan tiettyyn 
+// alkupaikkaan
+void startPosition(){
+  String send = "#";
+  Serial.print(send + 1 + "P" + baseValue );
+  Serial.print(send + 2 + "P" + shoulderValue);
+  Serial.print(send + 3 + "P" + elbowValue );
+  Serial.print(send + 4 + "P" + wristValue );
+  Serial.println(send + 5 + "P" + gripValue + "T" + basicTime);
 }
 
-// Functions
-boolean incrementServoValue(int servoValue) {
-
+void loop(){
+  
+  switchShoulderBack = digitalRead(2);
+  switchShoulderForward = digitalRead(3);
+  switchElbowBack = digitalRead(4);
+  switchElbowForward = digitalRead(5),
+  switchWristUp = digitalRead(6);
+  switchWristDown = digitalRead(7);
+  switchBase = analogRead(A0);
+  switchGrip = analogRead(A1);
+     
+  
+  if(switchShoulderBack == HIGH{
+    shoulderValue -= transitionSpeed;
+    updatePositions();
+  }
+  if(switchShoulderForward == LOW){
+    shoulderValue += transitionSpeed;
+    updatePositions();
+  }
+  if(switchElbowBack == LOW){
+    elbowValue -= transitionSpeed;
+    updatePositions();
+  }
+  if(switchElbowForward == LOW){
+    elbowValue += transitionSpeed;
+    updatePositions();
+  }
+  if(switchWristUp == LOW){
+    wristValue -= transitionSpeed;
+    updatePositions();
+  }
+  
+  if(switchWristDown == LOW){
+    wristValue += transitionSpeed;
+    updatePositions();
+  }
+  
 }
 
-boolean decrementServoValue(int servoValue) {
-
+void updatePositions(){
+  String send = "#";
+  Serial.print(send + 1 + "P" + baseValue );
+  Serial.print(send + 2 + "P" + shoulderValue);
+  Serial.print(send + 3 + "P" + elbowValue );
+  Serial.print(send + 4 + "P" + wristValue );
+  Serial.println(send + 5 + "P" + gripValue + "T" + basicTime);
+  delay(15);
+  
 }
 
-void sendCommand(int servoNumber, int servoValue) {
-	// Readies the command to be sent one character at a time.
-	
-
-}
 
