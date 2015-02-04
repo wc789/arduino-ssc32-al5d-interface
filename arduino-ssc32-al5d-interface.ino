@@ -23,6 +23,7 @@ int wristValue = 1500;
 //koura 
 int switchGrip = 0; 
 int gripValue = 1100;
+int newGripValue = 1100;
 
 
 //Vakio aika 1 sekunti
@@ -97,10 +98,18 @@ void loop(){
     updatePositions();
   }
   
-  newBaseValue = (analogRead(A0) * 2) + 500;
+  newBaseValue = (analogRead(A0) * 1.955) + 500;
   if(baseValue != newBaseValue) {
 	baseValue = newBaseValue;
 	updatePositions();
+  }
+  
+  newGripValue = (analogRead(A1) * 2.444);
+  if(gripValue != newGripValue) {
+	if (newGripValue > 1000) {
+		gripValue = newGripValue;
+		updatePositions();
+	}
   }
   
 }
