@@ -147,25 +147,32 @@ void calculateServoValues() {
 		elbowValue = 1500 / PI * Theta2 + 1000;
 		shoulderValue = 1700 / PI * Theta1 + 700;
 	} else if ((Theta2 < elbowLimitAngleLower) && (Theta1 < shoulderLimitAngleLower)) {
-		elbowValue = 1000;
+		elbowValue = 2500;
 		shoulderValue = 700;
 	} else if ((Theta1 >= shoulderLimitAngleLower) && (Theta2 < elbowLimitAngleLower)) {
-		elbowValue = 1000;
+		elbowValue = 2500;
 		shoulderValue = 1700 / PI * Theta1 + 700;
 	} else if ((Theta1 < shoulderLimitAngleLower) && (Theta2 >= elbowLimitAngleLower)) {
 		elbowValue = 1500 / PI * Theta2 + 1000;
 		shoulderValue = 700;
+	} else {
+		elbowValue = 1000;
+		shoulderValue = 1550;
+		String yolo = "";
+		Serial.print(yolo + "Theta1: " + Theta1 + "; Theta2:" + Theta2);
 	}
 }
 
-double calculateTheta2(int X, int Y) {
+double calculateTheta2(double X, double Y) {
 	double baseArg((X * X + Y * Y - shoulderLength * shoulderLength - elbowLength * elbowLength)
 					/ 2 * shoulderLength * elbowLength);
-	return atan2(sqrt(1 - baseArg), baseArg);
+	double result = atan2(sqrt(pow((1 - baseArg), 2)), baseArg);
+	return result;
 }
 
-double calculateTheta1(int X, int Y) {
+double calculateTheta1(double X, double Y) {
 	double k1 = shoulderLength + elbowLength * cos(calculateTheta2(X, Y));
 	double k2 = elbowLength * sin(calculateTheta2(X, Y));
-	return atan2(Y, X) - atan2(k2, k1);
+	double result = atan2(Y, X) - atan2(k2, k1);
+	return result;
 }
