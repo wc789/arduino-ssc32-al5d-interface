@@ -3,13 +3,14 @@
 //pohja
 int switchBase = 0;
 int baseValue = 1500;
+int newBaseValue = 1500;
 
 // alin servo
 int switchShoulderForward = 0;
 int switchShoulderBack = 0;
 int shoulderValue = 1500; 
 
-
+//kyynärpää
 int switchElbowForward = 0;
 int switchElbowBack = 0;
 int elbowValue = 1500;
@@ -22,12 +23,14 @@ int wristValue = 1500;
 //koura 
 int switchGrip = 0; 
 int gripValue = 1100;
+int newGripValue = 1100;
 
 
 //Vakioaika 1 sekunti. Käytetään lähinnä startPosition-metodissa
 int basicTime =2000;
 // Nopoeus jolla servot liikkuvat kun nappeja painetaan
 int transitionSpeed = 10;
+
 //Arvo kertoo kuinka korkeall koura on 
 float headHeight = 0.0;
 
@@ -35,7 +38,6 @@ float headHeight = 0.0;
 void setup(){
 // Valittu baud rate
   Serial.begin(9600);
-  
   
   delay(1000);
   startPosition();
@@ -78,14 +80,16 @@ void loop(){
   switchBase = analogRead(A0);
   switchGrip = analogRead(A1);
      
-  
+
   // Tarkistetaan mitä nappuloita painetaan
+
+
   if(switchShoulderBack == HIGH){
-    shoulderValue -= transitionSpeed;
+    shoulderValue += transitionSpeed;
     updatePositions();
   }
   if(switchShoulderForward == HIGH){
-    shoulderValue += transitionSpeed;
+    shoulderValue -= transitionSpeed;
     updatePositions();
   }
   if(switchElbowBack == HIGH){
@@ -104,6 +108,20 @@ void loop(){
   if(switchWristDown == HIGH){
     wristValue += transitionSpeed;
     updatePositions();
+  }
+  
+  newBaseValue = (analogRead(A0) * 1.955) + 500;
+  if(baseValue != newBaseValue) {
+	baseValue = newBaseValue;
+	updatePositions();
+  }
+  
+  newGripValue = (analogRead(A1) * 2.444);
+  if(gripValue != newGripValue) {
+	if (newGripValue > 1000) {
+		gripValue = newGripValue;
+		updatePositions();
+	}
   }
   
 }
@@ -130,6 +148,7 @@ void kinematics(){
   float sumFirst = 14.5*sin((alpha-500.0)/636.62);
   float sumSecond = 18.5*sin(((beta-1000)/477.46)-((alpha-500)/636.62));  
   
+
   headHeight = sumFirst- sumSecond;  
   Serial.println(headHeight);
 
