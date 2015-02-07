@@ -24,13 +24,16 @@ int switchGrip = 0;
 int gripValue = 1100;
 
 
-//Vakio aika 1 sekunti
+//Vakioaika 1 sekunti. Käytetään lähinnä startPosition-metodissa
 int basicTime =2000;
+// Nopoeus jolla servot liikkuvat kun nappeja painetaan
 int transitionSpeed = 10;
+//Arvo kertoo kuinka korkeall koura on 
 float headHeight = 0.0;
 
 
 void setup(){
+// Valittu baud rate
   Serial.begin(9600);
   
   
@@ -62,6 +65,8 @@ void startPosition(){
   Serial.println(send + 5 + "P" + gripValue + "T" + basicTime);
 }
 
+
+// loop sisältää varsinaisen ohjelman
 void loop(){
   
   switchShoulderBack = digitalRead(2);
@@ -74,6 +79,7 @@ void loop(){
   switchGrip = analogRead(A1);
      
   
+  // Tarkistetaan mitä nappuloita painetaan
   if(switchShoulderBack == HIGH){
     shoulderValue -= transitionSpeed;
     updatePositions();
@@ -114,6 +120,7 @@ void updatePositions(){
  
 }
 
+// Lasketaan kouran korkeus headHeight
 void kinematics(){
   
   double alpha = shoulderValue;
@@ -121,7 +128,7 @@ void kinematics(){
   float pi = 3.14;
   
   float sumFirst = 14.5*sin((alpha-500.0)/636.62);
-  float sumSecond = 18.5*sin(((beta-1000)/477,46)-((alpha-500)/636,62));  
+  float sumSecond = 18.5*sin(((beta-1000)/477.46)-((alpha-500)/636.62));  
   
   headHeight = sumFirst- sumSecond;  
   Serial.println(headHeight);
