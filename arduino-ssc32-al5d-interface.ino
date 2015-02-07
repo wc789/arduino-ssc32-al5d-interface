@@ -6,28 +6,28 @@
 int switchBase = 0;
 int newBaseValue = 1500;
 int baseValue = 1500;
-double baseHeight = 6.8;
+const double baseHeight = 68;
 
 // Olkapää
 int shoulderValue = 0;
-double shoulderLength = 14.6;
+const double shoulderLength = 146;
 double shoulderLimitAngleLower = 0;
 
 // Kyynärpää
 int elbowValue = 1500;
-double elbowLength = 18.6;
+const double elbowLength = 186;
 double elbowLimitAngleLower = 20 * PI / 180;
 
 // Ranteen korkeus
 int switchIncrementWristHeight = 0;
 int switchDecrementWristHeight = 0;
-double WristHeight = 20;
-double WristHeightPrime = WristHeight - baseHeight;
+double WristHeight = 200;
+double WristHeightPrime = -(WristHeight - baseHeight);
 
 // Ranteen etäisyys
 int switchIncrementWristDistance = 0;
 int switchDecrementWristDistance = 0;
-double WristDistance = 20;		// Jotain näihin arvoiksi, arvot mm?
+double WristDistance = 200;		// Jotain näihin arvoiksi, arvot mm?
 
 // Ranteen asento
 int switchWristDown = 0;
@@ -42,13 +42,13 @@ int newGripValue = 1100;
 
 //Vakio aika 1 sekunti
 int basicTime =2000;
-int transitionSpeed = 0.1;
+double transitionSpeed = 10.0;
 
 void setup(){
   Serial.begin(9600);
   
   delay(1000);
-  updatePositions();
+  startPosition();
   
 // alustaa tarvittavat nappulat liikuttamiseen
   pinMode(2, INPUT);
@@ -138,7 +138,7 @@ void updatePositions(){
 }
 
 void calculateServoValues() {
-	WristHeightPrime = WristHeight - baseHeight;
+	WristHeightPrime = baseHeight - WristHeight;
 	double Theta2 = calculateTheta2(WristDistance, WristHeightPrime);
 	double Theta1 = calculateTheta1(WristDistance, WristHeightPrime);
 	
