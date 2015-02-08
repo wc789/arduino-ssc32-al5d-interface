@@ -1,14 +1,12 @@
-// switch.. kertoo onko nappi painettu
-
 #include <math.h>
 
-//---------------------------------VAKIOT-------------------------------------
+// VAKIOT
 	const double baseHeight = 68;
 	const double shoulderLength = 146;
 	const double elbowLength = 186;
 	const double handLength = 86;
 
-//--------------------------------MUUTTUJAT-----------------------------------
+// MUUTTUJAT
 // kytkimet
 	int switchBase = 0;
 	int switchIncrementWristHeight = 0;
@@ -22,30 +20,31 @@
 // servojen parametrit
 	int baseValue = 1500;
 	int newBaseValue = 1500;
-
 	int shoulderValue = 1550;
 	int elbowValue = 1000;
 	int wristValue = 2180;
 	int gripValue = 1160;
 	int newGripValue = 1160;
 
-// servojen rajat
-	// double shoulderLimitAngleLower = 0;
-	// double elbowLimitAngleLower = 20 * PI / 180;
-
 // käänteiskinematiikka
-	// paikkaparametrit
-	double CoordX = 100;
-	double CoordY = 100;
+	// paikkakoordinaatit
+	double CoordX;
+	double CoordY;
+	double CoordZ;
+		
+	// servokulmat
+	double shoudlerAngleRad;
+	double elbowAngleRad;
+	double wristAngleRad;
+	double baseAngleRad;
 	
-	double wristDistanceX = 100;
-	double wristDistanceY = 100;
-	double handAngle = 0;
-	double wristDistance = sqrt(1 / (pow(wristDistanceX, 2) + pow((wristDistanceY),2)) - 1);
+	// muut muuttujat
+	double fingerRadius;
+	double wristDistAxisZ;
+	double wristShoulderLine;
+	double angleHorizToWristShoulderLine;
+	double angleWristShoulderLineToShoulderBone;
 	
-	// kulmat
-	double theta1 = 1;
-	double theta2 = 1;
 // Muutosparametrit
 	int basicTime =2000;
 	double transitionSpeed = 10.0;
@@ -131,6 +130,8 @@ void loop(){
   }
 }
 
+// METODIT
+
 void updatePositions(){
 	calculateServoValues();
 
@@ -143,54 +144,46 @@ void updatePositions(){
 }
 
 void calculateServoValues() {
-	theta2 = calcTheta2();
-	theta1 = calcTheta1();
 	
-	String emptyStr = "";
-	Serial.println(emptyStr + "Shoulder: " + shoulderValue + " Elbow: " + elbowValue + " Theta1: " 
-	+ theta1 + " Theta2: " + theta2 + " WristHeight: " + wristDistanceY + " WristDistance: " + wristDistanceX);
-	
-	elbowValue = 1500 / PI * theta2 + 1000;
-	shoulderValue = 1700 / PI * theta1 + 700;
 }
 
-double calcWristDistanceX() {
-	return ((CoordX - handLength * cos(handAngle)) / (2 * shoulderLength));
+void updateFingerRadius() {
+	radius = pow(CoordX, 2) + pow(CoordY);
 }
 
-double calcWristDistanceY() {
-	return ((CoordY - baseHeight - handLength * cos(handAngle)) / (2 * shoulderLength));
+void updateWristDistAxisZ() {
+	wristDistanceFromAxisZ = fingerRadius - handLength;
 }
 
-double calcFingerDistance() {
-	return sqrt(1 / (pow(calcWristDistanceX(), 2) + pow(calcWristDistanceY(), 2)) - 1);
+void updateWristShoulderLine() {
+	wristShoulderLine = sqrt(pow(wristDistanceFromAxisZ, 2) + pow(CoordZ, 2));
 }
 
-double calcShoulderGroundAngle() {
-	return atan2(calcWristDistanceX() - calcFingerDistance() * calcWristDistanceY(), calcWristDistanceY() + calcFingerDistance() * calcWristDistanceX());
+void updateAngleHorizToWristShoulderLine() {
+	atan2(CoordZ, wristDistAxisZ);
 }
 
-double calcElbowGroundAngle() {
-	return atan2(calcWristDistanceX() + calcFingerDistance() * calcWristDistanceY(), calcWristDistanceY() - calcFingerDistance() * calcWristDistanceX());
+void updateAngleWristShoulderLineToShoulderBone() {
+	angleWristShoulderLineToShoulderBone = acos((pow(shoulderLength, 2) + pow(wristShoulderLine, 2) + pow(elbowLength, 2)) / (2 * shoulderLength * wristShoulderLine));
 }
 
-double calcTheta1() {
-	double subResult = calcShoulderGroundAngle() - PI;
-	double result = subResult + subResult;
-	return result;
+void updateShoudlerAngleRad() {
+	shoudlerAngleRad = angleHorizToWristShoulderLine + angleWristShoulderLineToShoulderBone;
 }
 
-double calcTheta2() {
-	double subResult = calcElbowGroundAngle() - calcTheta1();
-	double result = subResult + subResult;
-	return result;
+void updateElbowAngleRad() {
+	elbowAngleRad =  acos(((elbowLength^2)+(shoulderLength^2)-(wristShoulderLine^2)) / (2*shoulderLength*elbowLength));
 }
 
-double calcTheta3() {
-	double subResult = handAngle - calcElbowGroundAngle();
-	double result = subResult + subResult;
-	return result;
+void updateWristAngleRad() {
+	wristAngleRad = -elbowAngleRad - shoudlerAngleRad + (2 * PI);
 }
+
+void updateBaseAngleRad() {
+	baseAngleRad = atan2(CoordX, CoordY);
+}
+
+//
 
 // void printInfo() {
 	// String emptyStr = "";
