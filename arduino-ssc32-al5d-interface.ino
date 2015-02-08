@@ -1,6 +1,20 @@
-// switch.. kertoo onko nappi painettu
+// VAKIOT
+const int numReadings = 3;
+const int readDelay = 10;
 
-//pohja
+// MUUTTUJAT
+	// potikoiden lukemiseen
+	int index1 = 0;
+	int readings1[numReadings];
+	int total1 = 0;
+	int average1 = 0;
+	
+	int index2 = 0;
+	int readings2[numReadings];
+	int total2 = 0;
+	int average2 = 0;
+	
+
 int switchBase = 0;
 int baseValue = 1500;
 int newBaseValue = 1500;
@@ -32,6 +46,14 @@ int transitionSpeed = 10;
 
 void setup(){
   Serial.begin(9600);
+  
+	for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+		readings1[thisReading] = 0;
+	}
+	
+	for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+		readings2[thisReading] = 0;
+	}
   
   delay(1000);
   startPosition();
@@ -75,22 +97,27 @@ void loop(){
   if(switchShoulderBack == HIGH){
     shoulderValue += transitionSpeed;
     updatePositions();
+	delay(readDelay);
   }
   if(switchShoulderForward == HIGH){
     shoulderValue -= transitionSpeed;
     updatePositions();
+	delay(readDelay);
   }
   if(switchElbowBack == HIGH){
     elbowValue -= transitionSpeed;
     updatePositions();
+	delay(readDelay);
   }
   if(switchElbowForward == HIGH){
     elbowValue += transitionSpeed;
     updatePositions();
+	delay(readDelay);
   }
   if(switchWristUp == HIGH){
     wristValue -= transitionSpeed;
     updatePositions();
+	delay(readDelay);
   }
   
   if(switchWristDown == HIGH){
@@ -98,13 +125,15 @@ void loop(){
     updatePositions();
   }
   
-  newBaseValue = (analogRead(A0) * 1.955) + 500;
+  newBaseValue = (runningAverageA0() * 1.956) + 500;
   if(baseValue != newBaseValue) {
 	baseValue = newBaseValue;
 	updatePositions();
   }
   
-  newGripValue = (analogRead(A1) * 2.444);
+  
+  
+  newGripValue = (runningAverageA1() * 2.444);
   if(gripValue != newGripValue) {
 	if (newGripValue > 1000) {
 		gripValue = newGripValue;
@@ -123,4 +152,46 @@ void updatePositions(){
   Serial.println(send + 5 + "P" + gripValue + "T" + 15);
   
   
+}
+
+int runningAverageA0() {
+	// subtract the last reading:
+   total1 = total1 - readings1[index1];         
+   // read from the sensor:  
+   readings1[index1] = analogRead(A0); 
+   // add the reading to the total:
+   total1 = total1 + readings1[index1];       
+   // advance to the next position in the array:  
+   index1 = index1 + 1;                    
+
+   // if we're at the end of the array...
+   if (index1 >= numReadings)              
+     // ...wrap around to the beginning: 
+     index1 = 0;                           
+
+   // calculate the average:
+   average1 = total1 / numReadings;
+   delay(readDelay);
+   return average1;
+}
+
+int runningAverageA1() {
+	// subtract the last reading:
+   total2 = total2 - readings2[index2];         
+   // read from the sensor:  
+   readings2[index2] = analogRead(A1); 
+   // add the reading to the total:
+   total2 = total2 + readings2[index2];       
+   // advance to the next position in the array:  
+   index2 = index2 + 1;                    
+
+   // if we're at the end of the array...
+   if (index2 >= numReadings)              
+     // ...wrap around to the beginning: 
+     index2 = 0;                           
+
+   // calculate the average:
+   average2 = total2 / numReadings;
+   delay(readDelay);
+   return average2;
 }
