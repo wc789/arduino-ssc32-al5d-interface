@@ -1,6 +1,6 @@
 // VAKIOT
 const int numReadings = 3;
-const int readDelay = 10;
+const int readDelay = 5;
 
 // MUUTTUJAT
 	// potikoiden lukemiseen
