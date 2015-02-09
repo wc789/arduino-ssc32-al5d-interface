@@ -1,20 +1,20 @@
 #include <math.h>
 
 // VAKIOT
-	const double baseHeight = 68;
-	const double shoulderLength = 146;
-	const double elbowLength = 186;
-	const double handLength = 86;
+	const double baseHeight = 6.8;
+	const double shoulderLength = 14.6;
+	const double elbowLength = 18.6;
+	const double handLength = 8.6;
 
 // MUUTTUJAT
 // kytkimet
 	int switchBase = 0;
-	int switchIncrementWristHeight = 0;
-	int switchDecrementWristHeight = 0;
-	int switchIncrementWristDistance = 0;
-	int switchDecrementWristDistance = 0;
-	int switchIncrementHandAngle = 0;
-	int switchDecrementHandAngle = 0;
+	int switchIncrementCoordX = 0;
+	int switchDecrementCoordX = 0;
+	int switchIncrementWristAngle = 0;
+	int switchDecrementWristAngle = 0;
+	int switchIncrementCoordZ = 0;
+	int switchDecrementCoordZ = 0;
 	int switchGrip = 0; 
 
 // servojen parametrit
@@ -28,26 +28,26 @@
 
 // käänteiskinematiikka
 	// paikkakoordinaatit
-	double CoordX;
-	double CoordY;
-	double CoordZ;
+	double CoordX = 0.2;
+	double CoordY = 0.2;
+	double CoordZ = 0.2;
 		
 	// servokulmat
-	double shoudlerAngleRad;
-	double elbowAngleRad;
-	double wristAngleRad;
-	double baseAngleRad;
+	double shoulderAngleRad = 0;
+	double elbowAngleRad = 0;
+	// double wristAngleRad = 0;
+	// double baseAngleRad = 0;
 	
 	// muut muuttujat
-	double fingerRadius;
-	double wristDistAxisZ;
-	double wristShoulderLine;
-	double angleHorizToWristShoulderLine;
-	double angleWristShoulderLineToShoulderBone;
+	double fingerRadius = 0;
+	double wristDistFromAxisZ = 0;
+	double wristShoulderLine = 0;
+	double angleHorizToWristShoulderLine = 0;
+	double angleWristShoulderLineToShoulderBone = 0;
 	
 // Muutosparametrit
 	int basicTime =2000;
-	double transitionSpeed = 10.0;
+	double transitionSpeed = 0.01;
 
 void setup(){
   Serial.begin(9600);
@@ -81,37 +81,37 @@ void startPosition(){
 
 void loop(){
   
-	switchIncrementWristDistance = digitalRead(2);
-	switchDecrementWristDistance = digitalRead(3);
-	switchIncrementWristHeight = digitalRead(4);
-	switchDecrementWristHeight = digitalRead(5);
-	switchIncrementHandAngle = digitalRead(6);
-	switchDecrementHandAngle = digitalRead(7);
+	switchIncrementCoordX = digitalRead(2);
+	switchDecrementCoordX = digitalRead(3);
+	switchIncrementCoordZ = digitalRead(4);
+	switchDecrementCoordZ = digitalRead(5);
+	switchIncrementWristAngle = digitalRead(6);
+	switchDecrementWristAngle = digitalRead(7);
 	switchBase = analogRead(A0);
 	switchGrip = analogRead(A1);
      
-	if (switchIncrementWristDistance == HIGH) {
+	if (switchIncrementCoordX == HIGH) {
 		CoordX += transitionSpeed;
 		updatePositions();
 	}
-  if (switchDecrementWristDistance == HIGH) {
+  if (switchDecrementCoordX == HIGH) {
 		CoordX -= transitionSpeed;
 		updatePositions();
 	}
-  if (switchIncrementWristHeight == HIGH) {
-		CoordY += transitionSpeed;
+  if (switchIncrementWristAngle == HIGH) {
+		wristValue -= 10;
 		updatePositions();
 	}
-  if (switchDecrementWristHeight == HIGH) {
-		CoordY -= transitionSpeed;
+  if (switchDecrementWristAngle == HIGH) {
+		wristValue += 10;
 		updatePositions();
 	}
-  if(switchIncrementHandAngle == HIGH){
-		wristValue -= 0.10;
+  if(switchIncrementCoordZ == HIGH){
+		CoordZ += transitionSpeed;
 		updatePositions();
   }
-  if(switchDecrementHandAngle == HIGH){
-		wristValue += 0.10;
+  if(switchDecrementCoordZ == HIGH){
+		CoordZ -= transitionSpeed;
 		updatePositions();
   }
   
@@ -133,8 +133,35 @@ void loop(){
 // METODIT
 
 void updatePositions(){
+	updateAngles();
 	calculateServoValues();
 
+	printInfo();
+	
+	if (baseValue < 500) {
+		baseValue = 500;
+	} else if (baseValue > 2500) {
+		baseValue = 2500;
+	}
+	
+	if (shoulderValue < 500) {
+		shoulderValue = 500;
+	} else if (shoulderValue > 2500) {
+		shoulderValue = 2500;
+	}
+	
+	if (elbowValue < 500) {
+		elbowValue = 500;
+	} else if (elbowValue > 2500) {
+		elbowValue = 2500;
+	}
+	
+	if (wristValue < 500) {
+		wristValue = 500;
+	} else if (wristValue > 2500) {
+		wristValue = 2500;
+	}
+	
 	String send = "#";
 	Serial.print(send + 1 + "P" + baseValue );
 	Serial.print(send + 2 + "P" + shoulderValue);
@@ -144,48 +171,64 @@ void updatePositions(){
 }
 
 void calculateServoValues() {
-	
+	// baseValue = degrees(baseAngleRad) * 9.833;
+	shoulderValue = degrees(shoulderAngleRad) * 9.222;
+	elbowValue = degrees(elbowAngleRad) * -9.444;
+	// wristValue = degrees(wristAngleRad) * 10;
 }
 
-void updateFingerRadius() {
-	radius = pow(CoordX, 2) + pow(CoordY);
+void updateAngles() {
+	// updateFingerRadius();
+	updateWristDistAxisZ();
+	updateWristShoulderLine();
+	updateAngleHorizToWristShoulderLine();
+	updateAngleWristShoulderLineToShoulderBone();
+	
+	updateShoulderAngleRad();
+	updateElbowAngleRad();
+	// updateWristAngleRad();
+	// updateBaseAngleRad();
 }
+
+// void updateFingerRadius() {
+	// fingerRadius = pow(CoordX, 2) + pow(CoordY, 2);
+// }	
 
 void updateWristDistAxisZ() {
-	wristDistanceFromAxisZ = fingerRadius - handLength;
+	wristDistFromAxisZ = CoordX;
 }
 
 void updateWristShoulderLine() {
-	wristShoulderLine = sqrt(pow(wristDistanceFromAxisZ, 2) + pow(CoordZ, 2));
+	wristShoulderLine = sqrt(pow(wristDistFromAxisZ, 2) + pow(CoordZ, 2));
 }
 
 void updateAngleHorizToWristShoulderLine() {
-	atan2(CoordZ, wristDistAxisZ);
+	angleHorizToWristShoulderLine = atan2(CoordZ, wristDistFromAxisZ);
 }
 
 void updateAngleWristShoulderLineToShoulderBone() {
-	angleWristShoulderLineToShoulderBone = acos((pow(shoulderLength, 2) + pow(wristShoulderLine, 2) + pow(elbowLength, 2)) / (2 * shoulderLength * wristShoulderLine));
+	angleWristShoulderLineToShoulderBone = acos(((pow(shoulderLength, 2)) + (pow(wristShoulderLine, 2)) - (pow(elbowLength, 2))) / (2 * shoulderLength * wristShoulderLine));
 }
 
-void updateShoudlerAngleRad() {
-	shoudlerAngleRad = angleHorizToWristShoulderLine + angleWristShoulderLineToShoulderBone;
+void updateShoulderAngleRad() {
+	shoulderAngleRad = angleHorizToWristShoulderLine + angleWristShoulderLineToShoulderBone;
 }
 
 void updateElbowAngleRad() {
-	elbowAngleRad =  acos(((elbowLength^2)+(shoulderLength^2)-(wristShoulderLine^2)) / (2*shoulderLength*elbowLength));
+	elbowAngleRad =  acos(((pow(elbowLength, 2)) + (pow(shoulderLength, 2)) - (pow(wristShoulderLine, 2))) / (2 * shoulderLength * elbowLength));
 }
 
-void updateWristAngleRad() {
-	wristAngleRad = -elbowAngleRad - shoudlerAngleRad + (2 * PI);
-}
-
-void updateBaseAngleRad() {
-	baseAngleRad = atan2(CoordX, CoordY);
-}
-
-//
-
-// void printInfo() {
-	// String emptyStr = "";
-	// Serial.println(emptyStr + "Shoulder: " + shoulderValue + " Elbow: " + elbowValue + " Theta1: " + Theta1 + " Theta2: " + Theta2);
+// void updateWristAngleRad() {
+	// wristAngleRad = -(elbowAngleRad) - shoulderAngleRad + (2 * PI);
 // }
+
+// void updateBaseAngleRad() {
+	// baseAngleRad = atan2(CoordX, CoordY);
+// }
+
+void printInfo() {
+	String emptyStr = " ";
+	Serial.print(emptyStr + fingerRadius + " " + wristDistFromAxisZ + " " + wristShoulderLine + " " + angleHorizToWristShoulderLine + " " + angleWristShoulderLineToShoulderBone);
+	Serial.print(emptyStr + " " + shoulderAngleRad + " " + elbowAngleRad + " " + " ");
+	Serial.print(emptyStr + CoordX + emptyStr + CoordY + emptyStr + CoordZ);
+}
